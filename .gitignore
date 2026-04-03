@@ -1,0 +1,30 @@
+# ─── Biometric System – .gitignore ───────────────────────────────────────────
+
+# Runtime data (auto-generated)
+data/users.db
+data/access_logs.csv
+data/encodings/*.pkl
+data/reports/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
