@@ -157,7 +157,7 @@ without hardware.
 
 ```bash
 python enrollment.py       # Interactive CLI enrolment
-python authentication.py   # Immediate face-scan session
+python authentication.py   # Immediate face-scan sessione
 python admin.py            # Admin dashboard only
 python access_log.py       # Log viewer / report generator
 ```

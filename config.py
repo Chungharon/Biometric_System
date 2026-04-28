@@ -17,7 +17,7 @@ LOCKOUT_DURATION = 300        # Lockout duration in seconds (5 minutes)
 CONFIDENCE_DISPLAY = True     # Show confidence score in output
 
 # ─── Paths ───────────────────────────────────────────────────────────────────
-BASE_DIR       = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR       = os.getcwd()
 DATA_DIR       = os.path.join(BASE_DIR, "data")
 DB_PATH        = os.path.join(DATA_DIR, "users.db")
 LOG_PATH       = os.path.join(DATA_DIR, "access_logs.csv")
@@ -42,6 +42,13 @@ ENCRYPTION_ITERATIONS = 12    # bcrypt cost factor
 # ─── Liveness Detection ──────────────────────────────────────────────────────
 LIVENESS_EYE_BLINK_THRESHOLD = 0.25   # EAR (Eye Aspect Ratio) blink threshold
 LIVENESS_REQUIRED_BLINKS     = 1      # Blinks required to pass liveness check
+
+# ─── PostgreSQL Database ─────────────────────────────────────────────────────
+DB_NAME     = "biometric_db"
+DB_USER     = "postgres"
+DB_PASSWORD = "dse8084/2021" 
+DB_HOST     = "localhost"
+DB_PORT     = "5432"
 
 # Ensure directories exist on import
 for _dir in (DATA_DIR, ENCODINGS_DIR, REPORT_DIR):

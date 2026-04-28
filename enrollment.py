@@ -177,7 +177,20 @@ def capture_face_encodings(
 
     # ── Encoding capture loop ──────────────────────────────────────────────
     encodings: List = []
-    print_status("ENROLLING", f"Capturing face samples for '{user_name}'. Look at the camera.")
+    instructions = [
+        "Look directly at the camera",
+        "Tilt your head slightly LEFT",
+        "Tilt your head slightly RIGHT",
+        "Tilt your head slightly UP",
+        "Tilt your head slightly DOWN",
+        "Smile or change expression",
+        "Turn slightly left",
+        "Turn slightly right",
+        "Look straight again",
+        "Final sample - hold still"
+    ]
+    
+    print_status("ENROLLING", f"Capturing face samples for '{user_name}'.")
 
     while len(encodings) < config.MAX_FACE_SAMPLES:
         ret, frame = cap.read()
@@ -190,33 +203,38 @@ def capture_face_encodings(
         encs   = face_recognition.face_encodings(rgb, locs)
 
         display = frame.copy()
-        status_txt = f"Samples: {len(encodings)}/{config.MIN_FACE_SAMPLES}"
+        
+        # Progress and Instructions
+        idx = min(len(encodings), len(instructions) - 1)
+        current_instruction = instructions[idx]
+        
+        status_txt = f"Progress: {len(encodings)}/{config.MIN_FACE_SAMPLES}"
+        
+        # Overlay UI
+        cv2.rectangle(display, (0, 0), (config.FRAME_WIDTH, 80), (0, 0, 0), -1) # Header bg
+        cv2.putText(display, f"INSTRUCTION: {current_instruction}",
+                    (20, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+        cv2.putText(display, status_txt,
+                    (20, 65), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
         if len(locs) == 1 and encs:
             top, right, bottom, left = locs[0]
             cv2.rectangle(display, (left, top), (right, bottom), (255, 140, 0), 2)
             encodings.append(encs[0])
-            print_status("ENROLLING", f"Sample {len(encodings)} captured.")
+            print_status("ENROLLING", f"Sample {len(encodings)}: {current_instruction}")
+            
+            # Flash green rectangle on success
+            cv2.rectangle(display, (left-5, top-5), (right+5, bottom+5), (0, 255, 0), 3)
+            cv2.imshow("Enrollment", display)
+            cv2.waitKey(500) # Short pause to show success and let user move
         elif len(locs) > 1:
-            cv2.putText(display, "Multiple faces detected – please be alone.",
-                        (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+            cv2.putText(display, "Multiple faces! Please be alone.",
+                        (20, config.FRAME_HEIGHT - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
         else:
-            cv2.putText(display, "No face detected – move closer.",
-                        (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+            cv2.putText(display, "Position your face in the frame",
+                        (20, config.FRAME_HEIGHT - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
 
-        cv2.putText(display, status_txt,
-                    (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
-        cv2.putText(display, f"Enrolling: {user_name}",
-                    (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
         cv2.imshow("Enrollment", display)
-
-        # Brief pause to avoid near-duplicate frames
-        time.sleep(0.3)
-
-        if len(encodings) >= config.MIN_FACE_SAMPLES:
-            # Check we have enough; keep collecting up to MAX
-            if len(encodings) >= config.MIN_FACE_SAMPLES:
-                pass   # continue collecting to MAX unless user quits
 
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
